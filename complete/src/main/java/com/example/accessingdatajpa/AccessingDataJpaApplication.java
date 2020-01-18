@@ -17,14 +17,14 @@ public class AccessingDataJpaApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(CustomerRepository repository) {
+	public CommandLineRunner demo(CustomerEntityRepository repository) {
 		return (args) -> {
 			// save a few customers
-			repository.save(new Customer("Jack", "Bauer"));
-			repository.save(new Customer("Chloe", "O'Brian"));
-			repository.save(new Customer("Kim", "Bauer"));
-			repository.save(new Customer("David", "Palmer"));
-			repository.save(new Customer("Michelle", "Dessler"));
+			repository.save(CustomerEntity.create().setFirstName("Jack").setLastName("Bauer"));
+			repository.save(CustomerEntity.create().setFirstName("Chloe").setLastName("O'Brian"));
+			repository.save(CustomerEntity.create().setFirstName("Kim").setLastName("Bauer"));
+			repository.save(CustomerEntity.create().setFirstName("David").setLastName("Palmer"));
+			repository.save(CustomerEntity.create().setFirstName("Michelle").setLastName("Dessler"));
 
 			// fetch all customers
 			log.info("Customers found with findAll():");
@@ -35,7 +35,7 @@ public class AccessingDataJpaApplication {
 			log.info("");
 
 			// fetch an individual customer by ID
-			Customer customer = repository.findById(1L);
+			Customer customer = repository.findById(1L).get();
 			log.info("Customer found with findById(1L):");
 			log.info("--------------------------------");
 			log.info(customer.toString());
@@ -53,5 +53,4 @@ public class AccessingDataJpaApplication {
 			log.info("");
 		};
 	}
-
 }

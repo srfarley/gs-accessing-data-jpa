@@ -24,25 +24,45 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class CustomerRepositoryTests {
 	@Autowired
-	private TestEntityManager entityManager;
-
+	private LegacyCustomerRepository legacyCustomers;
 	@Autowired
-	private CustomerRepository customers;
+	private CustomerEntityRepository customerEntities;
 
 	@Test
-	public void testFindByLastName() {
-		Customer customer = new Customer("first", "last");
-		entityManager.persist(customer);
+	public void testLegacyCustomerFindByLastName() {
+		LegacyCustomer customer = new LegacyCustomer("first", "last");
+		LegacyCustomer savedCustomer = legacyCustomers.save(customer);
+		assertThat(savedCustomer.getId()).isNotNull();
 
-		List<Customer> findByLastName = customers.findByLastName(customer.getLastName());
+		List<LegacyCustomer> findByLastName = legacyCustomers.findByLastName(customer.getLastName());
+
+		assertThat(findByLastName).extracting(LegacyCustomer::getLastName).containsOnly(customer.getLastName());
+
+		LegacyCustomer customerById = legacyCustomers.findById(savedCustomer.getId()).get();
+
+		assertThat(customerById.getId()).isEqualTo(savedCustomer.getId());
+	}
+
+	@Test
+	public void testCustomerEntityFindByLastName() {
+		CustomerEntity customer = CustomerEntity.create()
+				.setFirstName("first")
+				.setLastName("last");
+		Customer savedCustomer = customerEntities.save(customer);
+		assertThat(savedCustomer.getId()).isNotNull();
+
+		List<Customer> findByLastName = customerEntities.findByLastName(customer.getLastName());
 
 		assertThat(findByLastName).extracting(Customer::getLastName).containsOnly(customer.getLastName());
+
+		Customer customerById = customerEntities.findById(savedCustomer.getId()).get();
+
+		assertThat(customerById.getId()).isEqualTo(savedCustomer.getId());
 	}
 }
